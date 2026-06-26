@@ -4,7 +4,7 @@ import requests
 app = Flask(__name__)
 
 # Senin IPinfo panosundaki gizli anahtarın!
-IPINFO_TOKEN = "ef4f3aea5f874b"
+IPINFO_TOKEN = ""
 
 
 def ip_analiz_et_ipinfo(ip_adresi):
