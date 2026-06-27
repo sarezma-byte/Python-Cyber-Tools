@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>CYBER OPERATION 2026 - Panel</title>
+    <style>
+        body { background-color: #000; color: #0f0; font-family: monospace; padding: 20px; }
+        .gizli-kutu { border: 1px solid #0f0; padding: 15px; display: none; background: #111; margin-top: 10px;}
+        button { background: #0f0; color: #000; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; margin-right: 10px; }
+        button:hover { background: #0a0; }
+    </style>
+</head>
+<body>
+    <h1>ANONYCAT PANELİNE HOŞ GELDİN</h1>
+    <p>🇹🇷 [ANONYCAT] 🇹🇷 I reiterate: unauthorized access to someone's computer or performing unauthorized actions is illegal.</p>
+
+    <button onclick="goster('kod-alani')">SNİFFER YAZILIMI KODLARINI GÖSTER</button>
+    <button onclick="goster('vizyon-alani')">VİZYONUMUZ</button>
+    <button onclick="goster('kod-alani-2')">IP SCANNER KOLDARINI GÖSTER</button>
+
+    <pre id="kod-alani" class="gizli-kutu">
+from scapy.all import sniff
+import os
+import platform
+
+engellenenler = set()
+
+# Ekranı temizle
+os.system('cls' if platform.system() == "Windows" else 'clear')
+
+print("""
+################################################
+################################################
+#  __________________________________________  #
+# |                                          | #
+# |  🇹🇷     - CYBER OPERATION - 2026 -     🇹🇷 | #
+# |__________________________________________| #
+# ============================================ #
+#
+#           * * * * * *
+#         * * * *     * *            * *
+#        * * *                   * * * * * *
+#        * * *                     * * * *
+#         * * * *     * *         * *   * *
+#           * * * * * *
+#                                              #
+#               🇹🇷  [ANONYCAT] 🇹🇷               #
+################################################
+""")
+
+
+def kalkani_aktif_et(ip_adresi):
+    if ip_adresi in engellenenler:
+        return
+    print(f"\n[!!!] GÜVENLİK ALARMI: {ip_adresi} engelleniyor...")
+    komut = f'netsh advfirewall firewall add rule name="BLOCK_{ip_adresi}" dir=in action=block remoteip={ip_adresi}'
+    os.system(komut)
+    with open("kara_liste.txt", "a") as kara_liste:
+        kara_liste.write(f"{ip_adresi} - Tarih: 2026\n")
+    engellenenler.add(ip_adresi)
+    print(f"[!] BAŞARILI: {ip_adresi} bloklandı.")
+
+# 1. HAFIZA YÜKLEYİCİ: Dosya varsa, daha önce engellediklerini hatırla
+engellenenler = set()
+if os.path.exists("kara_liste.txt"):
+    with open("kara_liste.txt", "r") as dosya:
+        for satir in dosya:
+            ip = satir.split(" - ")[0] # Sadece IP kısmını al
+            engellenenler.add(ip.strip())
+
+# Artık kodun "Daha önce bu adamı engellemiştim, bir daha uğraşmayayım" diyecek.
+
+paket_sayaci = {}
+
+
+def paket_yakalayici(paket):
+    if paket.haslayer('IP') and paket.haslayer('TCP'):
+        src_ip = paket['IP'].src
+        dst_ip = paket['IP'].dst
+        dst_port = paket['TCP'].dport
+
+        baglanti_id = f"{src_ip} -> {dst_ip} (Port: {dst_port})"
+
+        # AG RAPORU (Dosya yazma işlemi burada)
+        with open("ag_raporu.txt", "a") as rapor:
+            rapor.write(f"{baglanti_id}\n")
+
+        paket_sayaci[baglanti_id] = paket_sayaci.get(baglanti_id, 0) + 1
+
+        print(f"[+] Trafik: {baglanti_id} | Sayı: {paket_sayaci[baglanti_id]}")
+
+        if dst_port not in [443, 80, 8080, 21, 22] and paket_sayaci[baglanti_id] > 10:
+            print(f"[!!!] ŞÜPHELİ YÜKSEK TRAFİK: {baglanti_id}")
+
+        if paket_sayaci[baglanti_id] > 50 and src_ip != "192.168.1.63":
+            kalkani_aktif_et(src_ip)
+
+
+print("Sistem tarama modunda... (CTRL+C ile durdur)")
+sniff(filter="ip or tcp", prn=paket_yakalayici, store=0)
+    </pre>
+
+    <pre id="vizyon-alani" class="gizli-kutu">
+Ben 6.sınıf öğrencisiyim 11 yaşındayım.
+Hedefim ilk olarak Google VPR kazanmak,
+ardından siber güvenlik uzmanı olmak.
+-------------------------------------------------------------------
+Ayrıca bizi githubda sarezma-byte adlı kişiden desteklerseniz,
+sizin sayenizde daha iyi geleceğimize Anonycat olarak inanıyoruz.
+e-mail = ahmetefegokalp2014@gmail.com
+ctf-nick = anony_cat
+    </pre>
+
+     <pre id="kod-alani-2" class="gizli-kutu">
+         from scapy.all import ARP, Ether, srp
+
+def ip_tara(ip_araligi):
+    # 1. ARP isteği oluştur (İstediğimiz IP'ye kim olduğunu soruyoruz)
+    arp = ARP(pdst=ip_araligi)
+    ether = Ether(dst="ff:ff:ff:ff:ff:ff") # Yayın adresi
+    paket = ether / arp
+
+    print(f"[!] Tarama başlatılıyor: {ip_araligi}...")
+
+    # 2. Paketi gönder ve cevapları al
+    cevaplar = srp(paket, timeout=3, verbose=0)[0]
+
+    cihazlar = []
+    for gonderilen, alinan in cevaplar:
+        cihazlar.append({'ip': alinan.psrc, 'mac': alinan.hwsrc})
+
+    # 3. Sonuçları listele
+    print("\n--- BULUNAN CİHAZLAR ---")
+    print("IP Adresi           MAC Adresi")
+    print("------------------------------------------")
+    for cihaz in cihazlar:
+        print(f"{cihaz['ip']:18} {cihaz['mac']}")
+
+# Kullanım: Kendi ağını yaz (Örn: 192.168.1.0/24)
+if __name__ == "__main__":
+    ip_tara("192.168.1.0/24")
+     </pre>
+    <script>
+        function goster(id) {
+            var x = document.getElementById(id);
+            if (x.style.display === "none" || x.style.display === "") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
