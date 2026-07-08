@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template, request
 import requests
 from bs4 import BeautifulSoup
 import yfinance as yf
+import os
 
 app = Flask(__name__)
 
@@ -76,4 +77,6 @@ def brief_api():
     return jsonify({"text": f"Piyasalar bugün hareketli. Dolar şu an {data['USD']} TL, BIST100 ise {data['BIST100']} seviyesinde seyrediyor."})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Render, port numarasını otomatik verir
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
