@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>WN Türk</title>
+    <style>
+        :root { --cnn-red: #cc0000; --bg: #f4f4f4; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; }
+        header { background: #000; color: white; padding: 20px; text-align: center; border-bottom: 5px solid var(--cnn-red); }
+        .container { max-width: 1200px; margin: 20px auto; display: grid; grid-template-columns: 1fr 2fr; gap: 20px; padding: 0 15px; }
+        .card { background: white; padding: 20px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .sidebar-title { color: var(--cnn-red); border-bottom: 2px solid var(--cnn-red); padding-bottom: 5px; }
+        .news-item { padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 0.95rem; }
+        .price-box { font-size: 1.2rem; font-weight: bold; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<header><h1>WN Türk</h1></header>
+
+<div class="container">
+    <aside>
+        <div class="card">
+            <h3 class="sidebar-title">GÜNLÜK ÖZET</h3>
+            <p id="brief-text">Yükleniyor...</p>
+        </div>
+        <div class="card">
+            <h3 class="sidebar-title">CANLI PİYASA</h3>
+            <div id="price-grid"></div>
+        </div>
+    </aside>
+
+    <main class="card">
+        <h3 class="sidebar-title">HABER AKIŞI</h3>
+        <div id="news-container"></div>
+    </main>
+</div>
+
+<script>
+    async function updateData() {
+        // 1. ÖZET VE PİYASA
+        try {
+            const briefRes = await fetch('/api/brief');
+            const briefData = await briefRes.json();
+            document.getElementById('brief-text').innerText = briefData.text;
+
+            const priceRes = await fetch('/api/prices');
+            const prices = await priceRes.json();
+            const grid = document.getElementById('price-grid');
+            grid.innerHTML = '';
+            for (let key in prices) {
+                grid.innerHTML += `<div class="price-box">${key}: <span style="color:#cc0000;">${prices[key]} TL</span></div>`;
+            }
+        } catch (e) { console.error("Dashboard hatası:", e); }
+
+        // 2. HABER AKIŞI (Linkli Başlıklar)
+        try {
+            const res = await fetch('/api/news');
+            const news = await res.json();
+            const container = document.getElementById('news-container');
+            container.innerHTML = '';
+
+            for (let cat in news) {
+                container.innerHTML += `<h4 style="color:#cc0000; margin-top:20px; border-bottom:1px solid #ddd;">${cat.toUpperCase()}</h4>`;
+
+                // news[cat] artık bir liste (array) ve içinde {title, link} nesneleri var
+                news[cat].forEach(item => {
+                    container.innerHTML += `
+                        <div class="news-item" style="padding: 5px 0;">
+                            <a href="${item.link}" target="_blank" style="text-decoration:none; color:black;">
+                                • ${item.title}
+                            </a>
+                        </div>`;
+                });
+            }
+        } catch (e) { console.error("Haber hatası:", e); }
+    }
+
+    updateData();
+    setInterval(updateData, 2000); // 1 dakikada bir güncelle
+</script>
+
+</body>
+</html>
